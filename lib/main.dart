@@ -3,6 +3,8 @@ import 'package:firebase_revsion/firebase_options.dart';
 import 'package:firebase_revsion/presentation/create_account.dart';
 import 'package:flutter/material.dart';
 
+
+//simple updates 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
