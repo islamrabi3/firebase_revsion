@@ -17,6 +17,7 @@ class _ImageUploaderState extends State<ImageUploader> {
   File? _imageFile;
   String? _downloadUrl;
   String pickedFileName = '';
+  bool isDeleting = false;
 
   Future<void> _pickImage() async {
     try {
@@ -57,14 +58,21 @@ class _ImageUploaderState extends State<ImageUploader> {
 
   deleteImageFromFirebaseStorage() async {
     try {
+      setState(() {
+        isDeleting = true;
+      });
       final storageRef =
           FirebaseStorage.instance.ref().child('uploads/$pickedFileName');
       await storageRef.delete();
       setState(() {
         _downloadUrl = null;
+        isDeleting = false;
       });
     } catch (e) {
       print('Error deleting image: $e');
+      setState(() {
+        isDeleting = false;
+      });
     }
   }
 
@@ -77,7 +85,10 @@ class _ImageUploaderState extends State<ImageUploader> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (_downloadUrl != null)
-              Image.network(_downloadUrl!)
+              SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Image.network(_downloadUrl!))
             else
               const Text('No image selected.'),
             const SizedBox(height: 20),
@@ -86,8 +97,10 @@ class _ImageUploaderState extends State<ImageUploader> {
               child: const Text('Pick & Upload Image'),
             ),
             ElevatedButton(
-              onPressed: () {},
-              child: const Text('Delete Image'),
+              onPressed: deleteImageFromFirebaseStorage,
+              child: isDeleting
+                  ? const CircularProgressIndicator()
+                  : const Text('Delete Image'),
             ),
           ],
         ),
